@@ -66,7 +66,7 @@ var Player = class Player {
 
   static create(pos) {
     return new Player(pos.plus(new Vec(0, -0.5)),
-                      new Vec(0, 0));
+      new Vec(0, 0));
   }
 }
 
@@ -106,7 +106,7 @@ var Coin = class Coin {
   static create(pos) {
     let basePos = pos.plus(new Vec(0.2, 0.1));
     return new Coin(basePos, basePos,
-                    Math.random() * Math.PI * 2);
+      Math.random() * Math.PI * 2);
   }
 }
 
@@ -133,7 +133,7 @@ function elt(name, attrs, ...children) {
 
 var DOMDisplay = class DOMDisplay {
   constructor(parent, level) {
-    this.dom = elt("div", {class: "game"}, drawGrid(level));
+    this.dom = elt("div", { class: "game" }, drawGrid(level));
     this.actorLayer = null;
     parent.appendChild(this.dom);
   }
@@ -148,14 +148,14 @@ function drawGrid(level) {
     class: "background",
     style: `width: ${level.width * scale}px`
   }, ...level.rows.map(row =>
-    elt("tr", {style: `height: ${scale}px`},
-        ...row.map(type => elt("td", {class: type})))
+    elt("tr", { style: `height: ${scale}px` },
+      ...row.map(type => elt("td", { class: type })))
   ));
 }
 
 function drawActors(actors) {
   return elt("div", {}, ...actors.map(actor => {
-    let rect = elt("div", {class: `actor ${actor.type}`});
+    let rect = elt("div", { class: `actor ${actor.type}` });
     rect.style.width = `${actor.size.x * scale}px`;
     rect.style.height = `${actor.size.y * scale}px`;
     rect.style.left = `${actor.pos.x * scale}px`;
@@ -164,7 +164,7 @@ function drawActors(actors) {
   }));
 }
 
-DOMDisplay.prototype.syncState = function(state) {
+DOMDisplay.prototype.syncState = function (state) {
   if (this.actorLayer) this.actorLayer.remove();
   this.actorLayer = drawActors(state.actors);
   this.dom.appendChild(this.actorLayer);
@@ -172,7 +172,7 @@ DOMDisplay.prototype.syncState = function(state) {
   this.scrollPlayerIntoView(state);
 };
 
-DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
+DOMDisplay.prototype.scrollPlayerIntoView = function (state) {
   let width = this.dom.clientWidth;
   let height = this.dom.clientHeight;
   let margin = width / 3;
@@ -183,7 +183,7 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
 
   let player = state.player;
   let center = player.pos.plus(player.size.times(0.5))
-                         .times(scale);
+    .times(scale);
 
   if (center.x < left + margin) {
     this.dom.scrollLeft = center.x - margin;
@@ -197,7 +197,7 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
   }
 };
 
-Level.prototype.touches = function(pos, size, type) {
+Level.prototype.touches = function (pos, size, type) {
   var xStart = Math.floor(pos.x);
   var xEnd = Math.ceil(pos.x + size.x);
   var yStart = Math.floor(pos.y);
@@ -206,7 +206,7 @@ Level.prototype.touches = function(pos, size, type) {
   for (var y = yStart; y < yEnd; y++) {
     for (var x = xStart; x < xEnd; x++) {
       let isOutside = x < 0 || x >= this.width ||
-                      y < 0 || y >= this.height;
+        y < 0 || y >= this.height;
       let here = isOutside ? "wall" : this.rows[y][x];
       if (here == type) return true;
     }
@@ -214,7 +214,7 @@ Level.prototype.touches = function(pos, size, type) {
   return false;
 };
 
-State.prototype.update = function(time, keys) {
+State.prototype.update = function (time, keys) {
   let actors = this.actors
     .map(actor => actor.update(time, this, keys));
   let newState = new State(this.level, actors, this.status);
@@ -236,23 +236,23 @@ State.prototype.update = function(time, keys) {
 
 function overlap(actor1, actor2) {
   return actor1.pos.x + actor1.size.x > actor2.pos.x &&
-         actor1.pos.x < actor2.pos.x + actor2.size.x &&
-         actor1.pos.y + actor1.size.y > actor2.pos.y &&
-         actor1.pos.y < actor2.pos.y + actor2.size.y;
+    actor1.pos.x < actor2.pos.x + actor2.size.x &&
+    actor1.pos.y + actor1.size.y > actor2.pos.y &&
+    actor1.pos.y < actor2.pos.y + actor2.size.y;
 }
 
-Lava.prototype.collide = function(state) {
+Lava.prototype.collide = function (state) {
   return new State(state.level, state.actors, "lost");
 };
 
-Coin.prototype.collide = function(state) {
+Coin.prototype.collide = function (state) {
   let filtered = state.actors.filter(a => a != this);
   let status = state.status;
   if (!filtered.some(a => a.type == "coin")) status = "won";
   return new State(state.level, filtered, status);
 };
 
-Lava.prototype.update = function(time, state) {
+Lava.prototype.update = function (time, state) {
   let newPos = this.pos.plus(this.speed.times(time));
   if (!state.level.touches(newPos, this.size, "wall")) {
     return new Lava(newPos, this.speed, this.reset);
@@ -265,18 +265,18 @@ Lava.prototype.update = function(time, state) {
 
 var wobbleSpeed = 8, wobbleDist = 0.07;
 
-Coin.prototype.update = function(time) {
+Coin.prototype.update = function (time) {
   let wobble = this.wobble + time * wobbleSpeed;
   let wobblePos = Math.sin(wobble) * wobbleDist;
   return new Coin(this.basePos.plus(new Vec(0, wobblePos)),
-                  this.basePos, wobble);
+    this.basePos, wobble);
 };
 
 var playerXSpeed = 7;
 var gravity = 30;
 var jumpSpeed = 17;
 
-Player.prototype.update = function(time, state, keys) {
+Player.prototype.update = function (time, state, keys) {
   let xSpeed = 0;
   if (keys.ArrowLeft) xSpeed -= playerXSpeed;
   if (keys.ArrowRight) xSpeed += playerXSpeed;
@@ -352,7 +352,7 @@ function runLevel(level, Display) {
 async function runGame(plans, Display) {
   for (let level = 0; level < plans.length;) {
     let status = await runLevel(new Level(plans[level]),
-                                Display);
+      Display);
     if (status == "won") level++;
   }
   console.log("You've won!");
