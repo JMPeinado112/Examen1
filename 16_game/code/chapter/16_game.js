@@ -83,11 +83,25 @@ var Lava = class Lava {
 
   static create(pos, ch) {
     if (ch == "=") {
-      return new Lava(pos, new Vec(2, 0));
+      return new Lava(pos, new Vec(5, 0));
     } else if (ch == "|") {
       return new Lava(pos, new Vec(0, 2));
     } else if (ch == "v") {
       return new Lava(pos, new Vec(0, 3), pos);
+    }
+    else if (ch == "/") {
+      return new Lava(pos, new Vec(10, 12));
+    }
+    else if (ch == "1") {
+      return new Lava(pos, new Vec(-10, 12));
+    }
+    else if (ch == "-") {
+      return new Lava(pos, new Vec(8, 0));
+    }
+    else if (ch == "!") {
+      return new Lava(pos, new Vec(0, 12));
+    } else if (ch == "*") {
+      return new Lava(pos, new Vec(0, 12), pos);
     }
   }
 }
@@ -112,11 +126,292 @@ var Coin = class Coin {
 
 Coin.prototype.size = new Vec(0.6, 0.6);
 
+var Bola = class Bola {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() { return "bola"; }
+
+  static create(pos, ch) {
+    if (ch == "l") {
+      return new Bola(pos, new Vec(35, 0), pos);
+    }
+
+  }
+}
+Bola.prototype.size = new Vec(3, 2);
+Bola.prototype.collide = function (state) {
+  return new State(state.level, state.actors, "lost");
+};
+Bola.prototype.update = function (time, state) {
+  let newPos = this.pos.plus(this.speed.times(time));
+  if (!state.level.touches(newPos, this.size, "wall")) {
+    return new Bola(newPos, this.speed, this.reset);
+  } else if (this.reset) {
+    return new Bola(this.reset, this.speed, this.reset);
+  } else {
+    return new Bola(this.pos, this.speed.times(-1));
+  }
+};
 var levelChars = {
   ".": "empty", "#": "wall", "+": "lava",
   "@": Player, "o": Coin,
-  "=": Lava, "|": Lava, "v": Lava
+  "=": Lava, "|": Lava, "v": Lava, "/": Lava, "!": Lava, "*": Lava, "-": Lava, "1": Lava, "l": Bola
 };
+var Monster = class Monster {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "monster";
+  }
+
+  static create(pos) {
+    return new Monster(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Monster(newPos, this.speed, this.reset);
+
+    } else {
+      return new Monster(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Monster.prototype.size = new Vec(4.5, 4);
+levelChars["B"] = Monster;
+
+var Enemy = class Enemy {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "enemy";
+  }
+
+  static create(pos) {
+    return new Enemy(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Enemy(newPos, this.speed, this.reset);
+
+    } else {
+      return new Enemy(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Enemy.prototype.size = new Vec(1.5, 2);
+levelChars["b"] = Enemy;
+
+var Enemy1 = class Enemy1 {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "enemy1";
+  }
+
+  static create(pos) {
+    return new Enemy1(pos.plus(new Vec(0, -1)), new Vec(0, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Enemy1(newPos, this.speed, this.reset);
+
+    } else {
+      return new Enemy1(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Enemy1.prototype.size = new Vec(1.5, 2);
+levelChars["1"] = Enemy1;
+
+var Enemy2 = class Enemy2 {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "enemy2";
+  }
+
+  static create(pos) {
+    return new Enemy2(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Enemy2(newPos, this.speed, this.reset);
+
+    } else {
+      return new Enemy2(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Enemy2.prototype.size = new Vec(1.5, 2);
+levelChars["2"] = Enemy2;
+
+var Enemy3 = class Enemy3 {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "enemy3";
+  }
+
+  static create(pos) {
+    return new Enemy3(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Enemy3(newPos, this.speed, this.reset);
+
+    } else {
+      return new Enemy3(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Enemy3.prototype.size = new Vec(1.5, 2);
+levelChars["3"] = Enemy3;
+
+var Enemy4 = class Enemy4 {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() {
+    return "enemy4";
+  }
+
+  static create(pos) {
+    return new Enemy4(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+  }
+
+  update(time, state) {
+    let newPos = this.pos.plus(this.speed.times(time));
+
+    if (!state.level.touches(newPos, this.size, "wall")) {
+      return new Enemy4(newPos, this.speed, this.reset);
+
+    } else {
+      return new Enemy4(this.pos, this.speed.times(-1));
+    }
+  }
+
+  collide(state) {
+    let player = state.player;
+
+    if (player.pos.y + player.size.y < this.pos.y + 0.5) {
+      let filtered = state.actors.filter(a => a != this);
+      return new State(state.level, filtered, state.status);
+
+    } else {
+      return new State(state.level, state.actors, "lost");
+    }
+  }
+}
+
+Enemy4.prototype.size = new Vec(1.5, 2);
+levelChars["4"] = Enemy4;
 
 var simpleLevel = new Level(simpleLevelPlan);
 
@@ -350,10 +645,28 @@ function runLevel(level, Display) {
 }
 
 async function runGame(plans, Display) {
-  for (let level = 0; level < plans.length;) {
+  this.lives = 10;
+  this.livesView = document.getElementById("vidas");
+  for (let level = 0; level < plans.length && lives > 0;) {
     let status = await runLevel(new Level(plans[level]),
       Display);
-    if (status == "won") level++;
+    if (status == "won") {
+      level++;
+    }
+
+    else {
+      lives--;
+      this.livesView.innerHTML = "Vidas: " + this.lives;
+    }
+
   }
-  console.log("You've won!");
+  if (lives > 0) {
+    console.log("You Win!");
+    document.location.reload();
+  }
+  else {
+    console.log("Game Over");
+    document.location.reload();
+  }
+
 }

@@ -1,30 +1,77 @@
+*{
+  margin: 0px;
+  padding: 0px;
+}
 body{
   margin: auto;
   height: top;
-
+  background-color: black;
 }
 .background{
    table-layout: fixed;
-  background: rgb(58, 105, 66);
+
+  background-image: url(imagenes/fondo2.jpg);
+  background-repeat: no-repeat;
+  background-size: contain;
 border-spacing: 0; }
 
-.lava          { background: rgb(248, 136, 7); }
-.wall          { background:  rgb(64, 64, 64);   }
+.lava          { background-image: url(imagenes/lava.gif);
+                 background-size: cover;
+                 background-position: center;       }
+
+.wall          { background-image: url(imagenes/Castle_Wall.png);
+                 background-size: cover;
+                 background-position: center;       }
 
 .actor  { position: absolute;  }
-.coin   { background: rgb(241, 229, 89); }
-.player { background: white; }
-.Monster { background: rgb(189, 35, 35); }
+.coin   { background-image: url(imagenes/gric.png);
+     background-size: cover;
+    background-position: center;    }
+.player { background-image: url(imagenes/player.png);
+          background-size: cover;
+          background-position: center; }
+.monster { background-image: url(imagenes/boss_final.gif);
+            background-size: cover;
+            background-position: center; }
 .game {
   overflow: hidden;
   max-width: 100%;
   max-height: 100%;
   position: relative;
 }
+.enemy{background-image: url(imagenes/semi_boss.gif);
+background-size: cover;
+background-position: center; }
+
+.enemy1{background-image: url(imagenes/boss1.gif);
+background-size: cover;
+background-position: center; }
+
+.enemy2{background-image: url(imagenes/boss2.gif);
+background-size: cover;
+background-position: center; }
+
+.enemy3{background-image: url(imagenes/boss4.gif);
+background-size: cover;
+background-position: center; }
+
+.enemy4{background-image: url(imagenes/boss3.gif);
+background-size: cover;
+background-position: center; }
+
+.bola{background-image: url(imagenes/bola.png);
+background-size: cover;
+background-position: center;
+}
 
 .lost .player {
-  background: rgb(160, 64, 64);
+  background-image: url(imagenes/player_muerto.png);
 }
 .won .player {
   box-shadow: -4px -7px 8px rgb(0, 250, 42), 4px -7px 8px rgb(0, 250, 42);
+}
+#vidas{
+  position: absolute;
+  z-index: 9999999999999;
+  color:white;
 }
