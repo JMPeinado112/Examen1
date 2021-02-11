@@ -138,8 +138,9 @@ var Bola = class Bola {
   static create(pos, ch) {
     if (ch == "l") {
       return new Bola(pos, new Vec(35, 0), pos);
+    }else if (ch == "i") {
+      return new Bola(pos, new Vec(-35, 0), pos);
     }
-
   }
 }
 Bola.prototype.size = new Vec(3, 2);
@@ -156,10 +157,73 @@ Bola.prototype.update = function (time, state) {
     return new Bola(this.pos, this.speed.times(-1));
   }
 };
+var Laser = class Laser {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() { return "laser"; }
+
+  static create(pos, ch) {
+    if (ch == "a") {
+      return new Laser(pos, new Vec(0,21), pos);
+    }
+  }
+}
+Laser.prototype.size = new Vec(3, 2);
+Laser.prototype.collide = function (state) {
+  return new State(state.level, state.actors, "lost");
+};
+Laser.prototype.update = function (time, state) {
+  let newPos = this.pos.plus(this.speed.times(time));
+  if (!state.level.touches(newPos, this.size, "wall")) {
+    return new Laser(newPos, this.speed, this.reset);
+  } else if (this.reset) {
+    return new Laser(this.reset, this.speed, this.reset);
+  } else {
+    return new Laser(this.pos, this.speed.times(-1));
+  }
+};
+var Laser2 = class Laser2 {
+  constructor(pos, speed, reset) {
+    this.pos = pos;
+    this.speed = speed;
+    this.reset = reset;
+  }
+
+  get type() { return "laser2"; }
+
+  static create(pos, ch) {
+    if (ch == "d") {
+      return new Laser2(pos, new Vec(21, 0), pos);
+    }    else if (ch == "g") {
+      return new Laser2(pos, new Vec(10, 12));
+    }
+    else if (ch == "h") {
+      return new Laser2(pos, new Vec(-10, 12));
+    }
+  }
+}
+Laser2.prototype.size = new Vec(3, 2);
+Laser2.prototype.collide = function (state) {
+  return new State(state.level, state.actors, "lost");
+};
+Laser2.prototype.update = function (time, state) {
+  let newPos = this.pos.plus(this.speed.times(time));
+  if (!state.level.touches(newPos, this.size, "wall")) {
+    return new Laser2(newPos, this.speed, this.reset);
+  } else if (this.reset) {
+    return new Laser2(this.reset, this.speed, this.reset);
+  } else {
+    return new Laser2(this.pos, this.speed.times(-1));
+  }
+};
 var levelChars = {
   ".": "empty", "#": "wall", "+": "lava",
   "@": Player, "o": Coin,
-  "=": Lava, "|": Lava, "v": Lava, "/": Lava, "!": Lava, "*": Lava, "-": Lava, "1": Lava, "l": Bola
+  "=": Lava, "|": Lava, "v": Lava, "/": Lava, "!": Lava, "*": Lava, "-": Lava, "1": Lava, "l": Bola, "i": Bola, "a": Laser, "d": Laser2, "g": Laser2, "h": Laser2
 };
 var Monster = class Monster {
   constructor(pos, speed, reset) {
@@ -285,7 +349,7 @@ var Enemy1 = class Enemy1 {
 }
 
 Enemy1.prototype.size = new Vec(1.5, 2);
-levelChars["1"] = Enemy1;
+levelChars["s"] = Enemy1;
 
 var Enemy2 = class Enemy2 {
   constructor(pos, speed, reset) {
@@ -383,7 +447,7 @@ var Enemy4 = class Enemy4 {
   }
 
   static create(pos) {
-    return new Enemy4(pos.plus(new Vec(0, -1)), new Vec(9, 0));
+    return new Enemy4(pos.plus(new Vec(0, -1)), new Vec(0, 0));
   }
 
   update(time, state) {
@@ -645,7 +709,7 @@ function runLevel(level, Display) {
 }
 
 async function runGame(plans, Display) {
-  this.lives = 10;
+  this.lives = 100;
   this.livesView = document.getElementById("vidas");
   for (let level = 0; level < plans.length && lives > 0;) {
     let status = await runLevel(new Level(plans[level]),

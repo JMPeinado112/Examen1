@@ -64,6 +64,17 @@ background-size: cover;
 background-position: center;
 }
 
+.laser{
+  background-image: url(imagenes/laser.png);
+  background-size: 100%;
+  background-position: bottom;
+}
+
+.laser2{background-image: url(imagenes/laser2.png);
+  background-size: cover;
+  background-position: center;
+}
+
 .lost .player {
   background-image: url(imagenes/player_muerto.png);
 }
